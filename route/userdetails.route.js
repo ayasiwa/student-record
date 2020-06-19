@@ -6,6 +6,17 @@ router.post('/', insertStudent);
 router.get('/', getStudent);
 router.get('/:id', getStudentById);
 
+// put = update
+    // need auth (to follow)
+    // update all data, same on save request body
+    // modified by (temporary NULL);
+    // modified by date NOW();
+
+// delete = delete
+    // need auth (to follow)
+    // modified by (temporary NULL);
+    // modified by date NOW();
+    
 async function insertStudent(req, res, next){
 
     const { body } = req;

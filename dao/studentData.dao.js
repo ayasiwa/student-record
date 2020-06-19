@@ -4,15 +4,15 @@ exports.insertStudent = insertStudent;
 exports.getStudent = getStudent;
 exports.getStudentById = getStudentById;
 
-
+const STUDENT_ROLE = 1;
 async function insertStudent(student, connection){
    
     try {
         const table = 'user_details';
         const params = [];
         const sql = `
-            INSERT INTO ${table} (first_name, middle_name, last_name, email, gender, password, birthdate , user_role, created_date, is_active)
-            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, NOW(), "1");    
+            INSERT INTO ${table} (first_name, middle_name, last_name, email, gender, password, birthdate, user_role_id)
+            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);    
     
         `; 
     
@@ -23,11 +23,12 @@ async function insertStudent(student, connection){
         params.push(student.gender);
         params.push(student.password);
         params.push(student.birthdate);
-        params.push(student.userrole);
-
+        params.push(STUDENT_ROLE);
 
     
-        return await connection.queryAsync(sql, params)
+        const savedStudent = await connection.queryAsync(sql, params);
+
+        return await connection.queryAsync(`UPDATE ${table} set created_by_id = ? WHERE id = ?`, [savedStudent.insertId, savedStudent.insertId]);
     } catch (err) {
         console.log('SQL QUERY ERROR:', err)
     }
