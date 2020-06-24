@@ -5,22 +5,61 @@ const encrypt = require('../util/encrypt');
 exports.insertStudent = insertStudent;
 exports.getStudent = getStudent;
 exports.getStudentById = getStudentById;
+exports.updateStudentById = updateStudentById;
+exports.deleteStudentById = deleteStudentById;
 
-async function insertStudent({student, admin}){
+
+
+
+async function updateStudentById(id, {student}){
     const connection = await mysql.getTransactionalConnection();
-    try{
-        // check if email exist
-            // if not, let save, else throw error "Email already exist!"
-            
+    try {
         student.password = await encrypt.encrypt_password(student.password);
-        const userStudent = await studentData.insertStudent(student, connection);
-       // const adminId = await studentData.insertStudent(admin, connection);
-
-        return mysql.commit(connection, 'Successfully saved!')
+        const studentInfo = await studentData.updateStudentById(id, student, connection);
+     
+        return mysql.commit(connection, 'Successfully Updated!')
 
     } catch (err) {
-        return mysql.rollback(connection,err);
+
+        return mysql.rollback(connection, err); 
     }
+}
+
+async function insertStudent({student}){
+    const connection = await mysql.getTransactionalConnection();
+
+    const dbtable = 'user_details';
+    const params2 = [];
+        const sqlQuery = `
+            SELECT COUNT(*)
+            AS emailCount 
+            FROM ${dbtable} where email = ?
+
+        `; 
+    
+    params2.push(student.email);
+
+    const checkEmail = await connection.queryAsync(sqlQuery, params2)
+    console.log(checkEmail);
+
+    if(checkEmail[0].emailCount > 0){
+        return "Email already exist."
+    }else{
+        try{
+            // check if email exist
+                // if not, let save, else throw error "Email already exist!"
+                
+            student.password = await encrypt.encrypt_password(student.password);
+            const userStudent = await studentData.insertStudent(student, connection);
+           
+            return mysql.commit(connection, 'Successfully saved!')
+    
+        } catch (err) {
+            return mysql.rollback(connection,err);
+        }
+    }
+
+    
 }
 
 
@@ -51,18 +90,20 @@ async function getStudentById(id){
         
         const studentInfo = await studentData.getStudentById(id, connection);
      
-
-        /*const result = {
-            info: {
-                //firstname: userInfoRes[0].firstname
-                ...userInfoRes[0]
-            },
-            birthdate: {
-                ...userBirthdateRes[0]
-            }
-        };
-*/
         return mysql.commit(connection, studentInfo)
+
+    } catch (err) {
+
+        return mysql.rollback(connection, err); 
+    }
+}
+
+async function deleteStudentById(id){
+    const connection = await mysql.getTransactionalConnection();
+    try {
+        const studentInfo = await studentData.deleteStudentById(id, connection);
+     
+        return mysql.commit(connection, 'Successfully Deleted!')
 
     } catch (err) {
 

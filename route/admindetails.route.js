@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const userService = require('../service/admindetails.service');
 
-router.post('/student', );
-router.post('/:id', insertAdmin);
-// router.get('/:id', getStudentById);
+//router.post('/student', );
+router.post('/', insertAdmin);
+router.get('/:id', getStudentById);
 router.put('/:id', updateAdmin);
-// router.delete('/:id', deleteStudent);
+router.delete('/:id', deleteStudent);
 
 // put = update
     // need auth (to follow)
@@ -32,9 +32,7 @@ router.put('/:id', updateAdmin);
 async function insertAdmin(req, res, next){
 
     const { body } = req;
-    const { params } = req;
-    const { id } = params;
-    const result = await userService.insertAdmin(id,body);
+    const result = await userService.insertAdmin(body);
     res.send(result);
     
 }
@@ -45,7 +43,7 @@ async function updateAdmin(req, res, next){
     const { id } = params;
     const result = await userService.updateAdmin(id, body);
     res.send(result);
-    
+
 }
 
 async function getStudentById(req, res, next){
@@ -56,10 +54,9 @@ async function getStudentById(req, res, next){
 }
 
 async function deleteStudent(req, res, next){
-    const { body } = req;
     const { params } = req;
     const { id } = params;
-    const result = await userService.deleteStudent(id, body);
+    const result = await userService.deleteStudent(id);
     res.send(result);
 }
 

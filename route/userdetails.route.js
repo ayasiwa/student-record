@@ -5,6 +5,8 @@ const userService = require('../service/userdetails.service');
 router.post('/', insertStudent);
 router.get('/', getStudent);
 router.get('/:id', getStudentById);
+router.put('/:id', updateStudentById);
+router.delete('/:id', deleteStudentById);
 
 // put = update
     // need auth (to follow)
@@ -16,13 +18,11 @@ router.get('/:id', getStudentById);
     // need auth (to follow)
     // modified by (temporary NULL);
     // modified by date NOW();
-    
+
 async function insertStudent(req, res, next){
 
     const { body } = req;
-
     const result = await userService.insertStudent(body);
-
     res.send(result);
     
 }
@@ -37,7 +37,27 @@ async function getStudentById(req, res, next){
     const { id } = params;
     const result = await userService.getStudentById(id);
     res.send(result);
- }
+}
 
+async function updateStudentById(req, res, next){
+
+    const { params } = req;
+    const { id } = params;
+    const { body } = req;
+    const result = await userService.updateStudentById(id, body);
+    
+    res.send(result);
+    
+}
+
+async function deleteStudentById(req, res, next){
+
+    const { params } = req;
+    const { id } = params;
+    const result = await userService.deleteStudentById(id);
+    
+    res.send(result);
+    
+}
 
 module.exports = router;
