@@ -17,10 +17,13 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+app.use(require('./middleware/decode.auth.middleware'));
 
 // ROUTES
 app.use('/api/student', require('./route/userdetails.route'));
 app.use('/api/admin', require('./route/admindetails.route'));
+app.use('/api/auth', require('./route/auth.route'));
+app.use('/api/login', require('./route/auth.route'));
 
 
 /**

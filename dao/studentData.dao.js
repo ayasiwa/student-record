@@ -13,30 +13,49 @@ exports.deleteStudentById = deleteStudentById;
 const STUDENT_ROLE = 2;
 async function insertStudent(student, connection){
     
-    try {
-        const table = 'user_details';
-        const params = [];
-        const sql = `
-            INSERT INTO ${table} (first_name, middle_name, last_name, email, gender, password, birthdate, user_role_id)
-            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);    
-    
+    const dbtable = 'user_details';
+    const params2 = [];
+        const sqlQuery = `
+            SELECT COUNT(*)
+            AS emailCount 
+            FROM ${dbtable} where email = ?
+
         `; 
     
-        params.push(student.firstname);
-        params.push(student.middlename);
-        params.push(student.lastname);
-        params.push(student.email);
-        params.push(student.gender);
-        params.push(student.password);
-        params.push(student.birthdate);
-        params.push(STUDENT_ROLE);
-
+    params2.push(student.email);
+    connection.queryOne
+    const checkEmail = await connection.queryOneAsync(sqlQuery, params2)
     
-        const savedStudent = await connection.queryAsync(sql, params);
-        return await connection.queryAsync(`UPDATE ${table} set created_by_id = ? WHERE id = ?`, [savedStudent.insertId, savedStudent.insertId]);
-    } catch (err) {
-        console.log('SQL QUERY ERROR:', err)
+
+    if(checkEmail.emailCount > 0){
+        return "Email already exist."
+    }else{
+        try {
+            const table = 'user_details';
+            const params = [];
+            const sql = `
+                INSERT INTO ${table} (first_name, middle_name, last_name, email, gender, password, birthdate, user_role_id)
+                VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);    
+        
+            `; 
+        
+            params.push(student.firstname);
+            params.push(student.middlename);
+            params.push(student.lastname);
+            params.push(student.email);
+            params.push(student.gender);
+            params.push(student.password);
+            params.push(student.birthdate);
+            params.push(STUDENT_ROLE);
+    
+        
+            const savedStudent = await connection.queryAsync(sql, params);
+            return await connection.queryAsync(`UPDATE ${table} set created_by_id = ? WHERE id = ?`, [savedStudent.insertId, savedStudent.insertId]);
+        } catch (err) {
+            console.log('SQL QUERY ERROR:', err)
+        }
     }
+    
 }
 
 async function getStudent(connection){
@@ -58,8 +77,6 @@ async function getStudent(connection){
         }else{
             console.log('Not existed');
         }
-
-        //return await connection.queryAsync( `SELECT * FROM 'user_details' where email = "christiandavid@gmail.com"`)
 
     } catch (err) {
         console.log('SQL QUERY ERROR:', err)
@@ -87,41 +104,63 @@ async function getStudentById(id, connection){
 } 
 
 async function updateStudentById(id, student, connection){
-    try {
-        const table = 'user_details';
-        const params = [];
-        const sql = `
-            UPDATE ${table} SET 
-            first_name = ?,
-            middle_name = ?,
-            last_name = ?,
-            email = ?,
-            gender = ?,
-            password = ?,
-            birthdate = ?,
-            modified_date = NOW()
-            
-            WHERE id = ?;
+    const dbtable = 'user_details';
+    const params2 = [];
+        const sqlQuery = `
+            SELECT COUNT(*)
+            AS emailCount 
+            FROM ${dbtable} where email = ?
+
         `; 
+    
+    params2.push(student.email);
+    connection.queryOne
+    const checkEmail = await connection.queryOneAsync(sqlQuery, params2)
 
-        params.push(student.firstname);
-        params.push(student.middlename);
-        params.push(student.lastname);
-        params.push(student.email);
-        params.push(student.gender);
-        params.push(student.password);
-        params.push(student.birthdate);
-        
-        params.push(id);
-
-        return await connection.queryAsync(sql, params)
-    } catch (err) {
-        console.log('SQL QUERY ERROR:', err)
+    if(checkEmail.emailCount > 0){
+        try {
+            // update modified_by, using logged user id
+            const table = 'user_details';
+            const params = [];
+            const sql = `
+                UPDATE ${table} SET 
+                first_name = ?,
+                middle_name = ?,
+                last_name = ?,
+                email = ?,
+                gender = ?,
+                password = ?,
+                birthdate = ?,
+                modified_date = NOW()
+                
+                WHERE id = ?;
+            `; 
+    
+            params.push(student.firstname);
+            params.push(student.middlename);
+            params.push(student.lastname);
+            params.push(student.email);
+            params.push(student.gender);
+            params.push(student.password);
+            params.push(student.birthdate);
+            
+            params.push(id);
+    
+            return await connection.queryAsync(sql, params)
+        } catch (err) {
+            console.log('SQL QUERY ERROR:', err)
+        }
+    }else{
+        return "Email already exist."
     }
+    
 } 
 
 async function deleteStudentById(id, connection){
     try {
+
+        // TODO:
+        // update modified_by, using logged user id
         const table = 'user_details';
         const params = [];
         const sql = `
@@ -129,7 +168,6 @@ async function deleteStudentById(id, connection){
             WHERE id = ?;
     
         `; 
-
         params.push(id);
 
         return await connection.queryAsync(sql, params)

@@ -12,14 +12,21 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "1.19.0",
+    "bunyan": "^1.8.13",
     "celebrate": "12.1.1",
+    "connect-roles": "^3.1.2",
     "cryptr": "^6.0.2",
     "dao": "0.0.4",
     "debug": "4.1.1",
     "express": "4.17.1",
+    "fs": "0.0.1-security",
     "http": "0.0.1-security",
-    "mysql": "^2.18.1",
+    "http-errors": "1.7.3",
+    "jsonwebtoken": "8.5.1",
+    "morgan": "^1.10.0",
+    "mysql": "2.18.1",
     "nodemon": "2.0.4",
+    "os": "^0.1.1",
     "util": "0.12.3"
   }
 }

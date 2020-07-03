@@ -14,7 +14,7 @@ async function insertAdmin({ admin }){
         admin.password = await encrypt.encrypt_password(admin.password);
         const userStudent = await adminData.insertAdmin(admin, connection);
 
-        return mysql.commit(connection, 'Successfully saved Admin!')
+        return mysql.commit(connection, userStudent);
 
     } catch (err) {
         return mysql.rollback(connection,err);

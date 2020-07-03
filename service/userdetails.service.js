@@ -1,6 +1,7 @@
 const mysql = require('../mysql.connection');
 const studentData = require('../dao/studentData.dao');
 const encrypt = require('../util/encrypt');
+const secretKey = "ANY STRING";
 
 exports.insertStudent = insertStudent;
 exports.getStudent = getStudent;
@@ -14,10 +15,14 @@ exports.deleteStudentById = deleteStudentById;
 async function updateStudentById(id, {student}){
     const connection = await mysql.getTransactionalConnection();
     try {
+        // TODO:
+        // check if email exist - done
         student.password = await encrypt.encrypt_password(student.password);
+
+        
         const studentInfo = await studentData.updateStudentById(id, student, connection);
      
-        return mysql.commit(connection, 'Successfully Updated!')
+        return mysql.commit(connection, studentInfo)
 
     } catch (err) {
 
@@ -26,38 +31,26 @@ async function updateStudentById(id, {student}){
 }
 
 async function insertStudent({student}){
+
+    // TODO:
+    // put thins checkinhg of email in dao layer - done
     const connection = await mysql.getTransactionalConnection();
 
-    const dbtable = 'user_details';
-    const params2 = [];
-        const sqlQuery = `
-            SELECT COUNT(*)
-            AS emailCount 
-            FROM ${dbtable} where email = ?
+   
+    try{
+        // check if email exist
+            // if not, let save, else throw error "Email already exist!" - done
+            
+        student.password = await encrypt.encrypt_password(student.password);
+        console.log(student.password);
+        const userStudent = await studentData.insertStudent(student, connection);
+        
+        return mysql.commit(connection, userStudent)
 
-        `; 
-    
-    params2.push(student.email);
-
-    const checkEmail = await connection.queryAsync(sqlQuery, params2)
-    console.log(checkEmail);
-
-    if(checkEmail[0].emailCount > 0){
-        return "Email already exist."
-    }else{
-        try{
-            // check if email exist
-                // if not, let save, else throw error "Email already exist!"
-                
-            student.password = await encrypt.encrypt_password(student.password);
-            const userStudent = await studentData.insertStudent(student, connection);
-           
-            return mysql.commit(connection, 'Successfully saved!')
-    
-        } catch (err) {
-            return mysql.rollback(connection,err);
-        }
+    } catch (err) {
+        return mysql.rollback(connection,err);
     }
+
 
     
 }

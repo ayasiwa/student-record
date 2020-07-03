@@ -1,23 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const userService = require('../service/userdetails.service');
+const user = require('../middleware/auth.middleware');
 
 router.post('/', insertStudent);
 router.get('/', getStudent);
 router.get('/:id', getStudentById);
-router.put('/:id', updateStudentById);
-router.delete('/:id', deleteStudentById);
+router.put('/:id', user.is('logged-in'), updateStudentById);
+router.delete('/:id', user.is('studentOnly'), deleteStudentById);
 
-// put = update
-    // need auth (to follow)
-    // update all data, same on save request body
-    // modified by (temporary NULL);
-    // modified by date NOW();
-
-// delete = delete
-    // need auth (to follow)
-    // modified by (temporary NULL);
-    // modified by date NOW();
 
 async function insertStudent(req, res, next){
 

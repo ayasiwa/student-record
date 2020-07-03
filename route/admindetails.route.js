@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const userService = require('../service/admindetails.service');
+const user = require('../middleware/auth.middleware');
 
-//router.post('/student', );
 router.post('/', insertAdmin);
 router.get('/:id', getStudentById);
-router.put('/:id', updateAdmin);
+router.put('/:id', user.is('adminOnly'), updateAdmin);
 router.delete('/:id', deleteStudent);
 
 // put = update
